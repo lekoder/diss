@@ -28,7 +28,7 @@ describe('inject', function () {
     });
 
     describe('register', function() {
-        describe('provider(name,module)', function () {
+        describe('provider(name,provider)', function () {
             it("regiters anonymous function", function () {
                 (function() { diss.register.provider('noDeps', noDeps); }).should.not.throw();
             });
@@ -43,12 +43,35 @@ describe('inject', function () {
                     diss.register.provider('nonprovider',{} );
                 }).should.throw(TypeError); 
             });
+        });
+        describe('module(name,module)', function() {
             it("allows to register a module", function() {
                 (function() { diss.register.module('test',{}); }).should.not.throw();
             });
-            
+            it("throws TypeError if module name is not a string", function() {
+                (function() { diss.register.module(123) }).should.throw();
+            });
         });
     });
+    describe('require(name,host)', function() {
+        it("registers required file as module", function() {
+            diss.require('./mock/require-test', module );
+            diss.resolve(function(mockRequireTest) {
+                should.exist( mockRequireTest );
+                mockRequireTest.should.be.equal( require('./mock/require-test'));;
+            });
+        });
+    });
+    describe('loadDependencies(pkg,main)', function() {
+       it("loads dependencies as modules from provided package.json object", function() {
+           var pkg = { dependencies: { "mocha":"latest"}};
+           diss.loadDependencies(pkg, module);
+           diss.resolve(function(mocha) {
+              mocha.should.be.equal(require('mocha')); 
+           });
+       });
+    });
+    
     describe('resolve(module)', function() {
         it("resolves anonymous module without dependencies", function() {
             diss.resolve(noDeps).should.have.property('mod').which.is.equal(noDeps);
@@ -131,5 +154,10 @@ describe('inject', function () {
             diss.register.provider('test/to/resolve', td);
             diss.resolve(tm).should.be.equal(true);
         });
+        it("throws SyntaxError when resolving unexinsting dependency", function() {
+            (function() {
+                diss.resolve(function(should) { })
+            }).should.throw(/exist/);
+        })
     });
 });
