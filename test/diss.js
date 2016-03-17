@@ -43,6 +43,11 @@ describe('inject', function () {
                     diss.register.provider('nonprovider',{} );
                 }).should.throw(TypeError); 
             });
+            it("throws TypeError if provider name is not a string", function() {
+                (function() { 
+                    diss.register.provider(123,{} );
+                }).should.throw(TypeError);
+            })
         });
         describe('module(name,module)', function() {
             it("allows to register a module", function() {
@@ -69,6 +74,12 @@ describe('inject', function () {
            diss.resolve(function(mocha) {
               mocha.should.be.equal(require('mocha')); 
            });
+       });
+       it("does nothing if there are no dependencies", function() {
+            var pkg = {};
+            (function() {
+                diss.loadDependencies(pkg, module);
+            }).should.not.throw();
        });
     });
     describe('loadProviders(providers,main,directory)', function() {
@@ -173,6 +184,17 @@ describe('inject', function () {
             (function() {
                 diss.resolve(function(should) { })
             }).should.throw(/exist/);
-        })
+        });
+        it("throws TypeError when trying to resolve non-module", function() {
+            (function() {
+                diss.resolve({});
+            }).should.throw(TypeError);
+        });
+        it("throws SyntaxError when trying to resolve undefined", function() {
+            var u;
+            (function() {
+                diss.resolve(u);
+            }).should.throw(SyntaxError);
+        });
     });
 });
