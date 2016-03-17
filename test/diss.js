@@ -71,7 +71,22 @@ describe('inject', function () {
            });
        });
     });
-    
+    describe('loadProviders(providers,main,directory)', function() {
+        it("loads providers from current directory", function() {
+            diss.loadProviders(['test-provider-in-here'], module);
+            diss.resolve(function(testProviderInHere) {
+               should.exist(testProviderInHere);
+            });
+        });
+        it("loads providers from specified directory", function() {
+            diss.loadProviders(['test-provider-a','test-provider-b'], module, './mock');
+            diss.resolve(function(testProviderA,testProviderB) {
+               should.exist(testProviderA);
+               should.exist(testProviderB);
+               testProviderA.dep.should.be.equal(testProviderB); 
+            });
+        })
+    });
     describe('resolve(module)', function() {
         it("resolves anonymous module without dependencies", function() {
             diss.resolve(noDeps).should.have.property('mod').which.is.equal(noDeps);
