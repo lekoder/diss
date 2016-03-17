@@ -1,0 +1,29 @@
+{
+  "name": "diss",
+  "version": "0.0.1",
+  "description": "Dependency Injection Super Simple",
+  "main": "inject.js",
+  "scripts": {
+    "test": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec",
+    "cover": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec && xdg-open coverage/lcov-report/index.html"
+  },
+  "author": "Mariusz 'koder' Chwalba <mariusz@chwalba.net>",
+  "license": "ISC",
+  "devDependencies": {
+    "growl": "^1.9.2",
+    "hippie": "^0.4.0",
+    "istanbul": "^0.4.2",
+    "mocha": "^2.4.5",
+    "rewire": "^2.5.1",
+    "should": "^8.2.2",
+    "sinon": "^1.17.3"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "keywords": [
+    "di",
+    "dependency-injection"
+  ]
+}
