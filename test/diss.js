@@ -1,10 +1,10 @@
 var should = require('should');
-var dissForge = require('../lib/inject.js');
+var dissForge = require('../lib/diss.js');
 
 describe('inject', function () {
 
     var diss;
-    var noDeps, named, arrow, depends, dependsOnMore, dependsOnEvenMore, arrowDepends, circa, circb, circself;
+    var noDeps, named, arrow, depends, dependsOnMore, dependsOnEvenMore, arrowDepends, circa, circb, circself, invalid;
 
     beforeEach(function () {
         diss = dissForge();
@@ -22,20 +22,30 @@ describe('inject', function () {
         circa = function(circb) { return { mod: circb, dep:[circa]}; };
         circb = function(circa) { return { mod: circa, dep:[circb]}; };
         
-        circself = function( circself ) { return { mod:circself, dep: [circself] } }
+        circself = function( circself ) { return { mod:circself, dep: [circself] } };
+        
+        invalid = function( nonexisting ) { return { mod:invalid, dep: [nonexisting] }};
     });
 
-;
-
-    describe('register(name,module)', function () {
-        it("regiters anonymous function", function () {
-            (function() { diss.register('noDeps', noDeps); }).should.not.throw();
-        });
-        it("registers named function", function() {;
-            (function() { diss.register('named', named); }).should.not.throw();
-        });
-        it("registers fat arrow", function() {
-            (function() { diss.register('arrow', arrow); }).should.not.throw();
+    describe('register', function() {
+        describe('provider(name,module)', function () {
+            it("regiters anonymous function", function () {
+                (function() { diss.register.provider('noDeps', noDeps); }).should.not.throw();
+            });
+            it("register.providers named function", function() {;
+                (function() { diss.register.provider('named', named); }).should.not.throw();
+            });
+            it("register.providers fat arrow", function() {
+                (function() { diss.register.provider('arrow', arrow); }).should.not.throw();
+            });
+            it("throws when registering non-provider as provider", function() {
+                (function() { 
+                    diss.register.provider('nonprovider',{} );
+                }).should.throw(TypeError); 
+            });
+            it("allows to register a module", function() {
+                (function() { diss.register.module('test',{}); }).should.not.throw();
+            })
         });
     });
     describe('resolve(module)', function() {
@@ -49,7 +59,7 @@ describe('inject', function () {
             diss.resolve(arrow).should.have.property('mod').which.is.equal(arrow); 
         });
         it("resolves dependency", function() {;
-            diss.register('noDeps',noDeps);
+            diss.register.provider('noDeps',noDeps);
             diss.resolve(depends).should.have.property('mod').which.is.equal(depends);
             diss.resolve(depends).should.have.property('dep')
                     .which.has.property(0)
@@ -57,9 +67,9 @@ describe('inject', function () {
                     .which.is.equal(noDeps);
         });
         it("resolves multiple dependencies", function() {
-            diss.register('noDeps',noDeps)
-                .register('named', named)
-                .register('arrow',arrow);
+            diss.register.provider('noDeps',noDeps)
+                .register.provider('named', named)
+                .register.provider('arrow',arrow);
                 
             var resolved = diss.resolve(dependsOnMore);
             resolved.should.have.property('mod').which.is.equal(dependsOnMore);
@@ -69,10 +79,10 @@ describe('inject', function () {
             });
         });
         it("resolves passing dependency", function() {
-            diss.register('noDeps',noDeps)
-                .register('named', named)
-                .register('arrow',arrow)
-                .register('dependsOnMore', dependsOnMore);
+            diss.register.provider('noDeps',noDeps)
+                .register.provider('named', named)
+                .register.provider('arrow',arrow)
+                .register.provider('dependsOnMore', dependsOnMore);
                 
             var resolved = diss.resolve(dependsOnEvenMore);
             resolved.should.have.property('mod').which.is.equal(dependsOnEvenMore);
@@ -82,18 +92,24 @@ describe('inject', function () {
             });
         });
         it("resolves arrow function with dependencies", function() {
-            diss.register('named', named);
+            diss.register.provider('named', named);
             var resolved = diss.resolve(arrowDepends);
             resolved.should.have.property('mod').which.is.equal(arrowDepends);
             resolved.dep[0].should.have.property('mod').which.is.equal(named);
         });
-        it("resolves circual dependency", function() {
-            diss.register('circa',circa)
-                .register('circb',circb);
-                
-            var resolved = diss.resolve(circa);
-            resolved.should.have.property('mod').shich.is.equal(circa);
-            resolved.dep[0].should.have.property('mod').shich.is.equal(circb);
+        it("should throw on circual dependency", function() {
+            diss.register.provider('circa',circa)
+                .register.provider('circb',circb);
+            (function() { diss.resolve(circa); }).should.throw(SyntaxError);
+        });
+        it("should throw on circual self-dependency", function() {
+            diss.register.provider('circself',circself);
+            (function() { diss.resolve(circself); }).should.throw(SyntaxError);
+        });
+        it("should throw on non-existing dependency", function() {
+            (function() { 
+                diss.resolve(invalid) 
+            }).should.throw(SyntaxError); 
         });
         
     });
