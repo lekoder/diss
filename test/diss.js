@@ -111,6 +111,17 @@ describe('inject', function () {
                 diss.resolve(invalid) 
             }).should.throw(SyntaxError); 
         });
-        
+        it("resolves module depending on verbatim object", function() {
+            var verbatim = {};
+            diss.register.module('verbatim',verbatim);
+            diss.resolve( function(verbatim) { return verbatim; } ).should.be.equal(verbatim);
+        });
+        it("throws TypeError wish function defined without parenthesis", function() {
+            var test = {};
+            diss.register.module('test',test);
+            (function() {
+                diss.resolve(test=>test)    
+            }).should.throw(TypeError);
+        })
     });
 });
