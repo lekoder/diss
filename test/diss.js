@@ -45,7 +45,8 @@ describe('inject', function () {
             });
             it("allows to register a module", function() {
                 (function() { diss.register.module('test',{}); }).should.not.throw();
-            })
+            });
+            
         });
     });
     describe('resolve(module)', function() {
@@ -122,6 +123,13 @@ describe('inject', function () {
             (function() {
                 diss.resolve(test=>test)    
             }).should.throw(TypeError);
-        })
+        });
+        it("resolves provider using canonized name", function() {
+            var tm = function( testToResolve ) { return testToResolve; },
+                td = function() { return true; };
+                
+            diss.register.provider('test/to/resolve', td);
+            diss.resolve(tm).should.be.equal(true);
+        });
     });
 });
