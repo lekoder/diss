@@ -28,6 +28,6 @@
   ],
   "repository": {
     "type": "git",
-    "url": "ssh://git@gitlab.cashbill.pl:10022/lib/diss.git"
+    "url": "git@github.com:lekoder/diss.git"
   }
 }
