@@ -26,8 +26,7 @@ module.exports = function( d1, d2 ) {
 }
 ```
 
-## Intended usage
-
+## Quick start
 main.js
 ```js
 var diss = require('diss')(),
@@ -47,7 +46,100 @@ diss.resolve(function(rest) {
    rest.startServer(); 
 });
 ```
+## API
 
-# Convinience methods
+`require('diss')` gives you a injector provider. Call it to get an instance of incejctor. Register
+all your dependencies and call it's `resolve` on your main application provider.  
 
-# Gotchas
+### resolve(provider)
+* `provider`: provider to resolve.
+
+Takes a provider, examines it's signature using reflection and injects all it's depencencies.
+If any of said dependencies are providers themselves, it will resolve their  dependencies recursively.
+
+```js
+diss.resolve(function(mysql, logger, http) {
+    // [...] 
+});
+```
+
+### require(name,[main])
+* `name`: string representing a name of module to load and register.
+* `main`: module to call require from. Defaults to `require.main`, which is the entry pointof application. 
+
+A convinience method, shortcut to:
+```js
+diss.register.module('name', require('name') );
+diss.register.module('name', main.require('name') );
+``` 
+
+### loadDepencencies(pkg,[main])
+* `pkg`: object representing `package.json`, ie. `require('package.json')` 
+* `main`: module to call require from. Defaults to `require.main`, which is the entry pointof application.
+
+A convinience method, equivalent to iterating over all dependencies listed in `package.json` and calling
+`diss.require` on all of them.
+
+```js
+diss.loadDependencies(require('package.json'));
+```
+### loadProviders(providers, [main], [directory])
+* `providers`: array of string names of your providers.
+* `main`: module to call require from. Defaults to `require.main`, which is the entry pointof application.
+* `directory`: directory to load from. Defaults to current directory.
+ 
+A convinience method, equivalent to call of `diss.register.provider` on all supplied files.
+
+```js
+diss.loadProviders(['mod1','mod2','mod3','foo/mod4'])
+diss.loadProviders(['bar/a','bar/b'],module,'./src/examlpe');
+```
+is equivalent to:
+```js
+diss.register.provider('mod1', require('./mod1'));
+diss.register.provider('mod2', require('./mod2'));
+diss.register.provider('mod3', require('./mod3'));
+diss.register.provider('fooMod4', require('./foo/mod3'));
+diss.register.provider('barA', require('./src/example/bar/a'));
+diss.register.provider('barB', require('./src/example/bar/b'));
+```
+
+### register.module(name, module)
+* `name`: string containing name to register.
+* `module`: object to register under that sting.
+
+Module is a object provied as-is to providers when resolving them. Use modules for non-DI
+dependencies, ie:
+
+```js
+diss.register.module('Promise', require('bluebird') );
+///[...]
+diss.resolve(function( Promise ) {
+    // Promise contains bluebird module
+});
+```
+
+### register.provider(name, provider)
+* `name`: string containing name to register.
+* `provider`: provider to register.
+
+Provider is a function that has dependencies as parameters and returns an object, which is
+passed as dependency to other providers.
+
+```js
+diss.register.provider('myLogger', function(genericLogger, pkg) {
+    return genericLogger.createInstance({
+        name: pkg.name,
+        level: 'info'
+    });
+});
+
+diss.resolve(function( myLogger ) {
+    // myLogger here will be the result of .createInstance
+});
+```
+
+## Auto-generated names
+When names are auto-generated using convinience methods, they are based
+on passed name and camelcased: `some-module` becomes `someModule` in dependencies.
+
