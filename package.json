@@ -5,11 +5,13 @@
   "main": "lib/diss.js",
   "scripts": {
     "test": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec",
-    "cover": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec && xdg-open coverage/lcov-report/index.html"
+    "cover": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec && xdg-open coverage/lcov-report/index.html",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
   },
   "author": "Mariusz 'koder' Chwalba <mariusz@chwalba.net>",
   "license": "ISC",
   "devDependencies": {
+    "coveralls": "^2.11.8",
     "growl": "^1.9.2",
     "hippie": "^0.4.0",
     "istanbul": "^0.4.2",
