@@ -25,5 +25,9 @@
   "keywords": [
     "di",
     "dependency-injection"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@gitlab.cashbill.pl:10022/lib/diss.git"
+  }
 }
