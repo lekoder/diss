@@ -1,5 +1,8 @@
 # DI+KISS
 
+[![Build Status](https://travis-ci.org/lekoder/diss.svg?branch=master)](https://travis-ci.org/lekoder/diss)
+[![Coverage Status](https://coveralls.io/repos/github/lekoder/diss/badge.svg?branch=master)](https://coveralls.io/github/lekoder/diss?branch=master)
+
 DISS is simple and convinient dependency injector for `node.js`. It usees similar pattern to AngularJS
 dependency injector.
 
