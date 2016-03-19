@@ -171,7 +171,7 @@ describe('es5', function() {
                 var test = {};
                 diss.register.module('test',test);
                 (function() {
-                    diss.resolve(test=>test)    
+                    diss.resolve(function(test) {return test;})    
                 }).should.throw(TypeError);
             });
             it("resolves provider using canonized name", function() {
