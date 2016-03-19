@@ -167,13 +167,6 @@ describe('es5', function() {
                 diss.register.module('verbatim',verbatim);
                 diss.resolve( function(verbatim) { return verbatim; } ).should.be.equal(verbatim);
             });
-            it("throws TypeError wish function defined without parenthesis", function() {
-                var test = {};
-                diss.register.module('test',test);
-                (function() {
-                    diss.resolve(function(test) {return test;})    
-                }).should.throw(TypeError);
-            });
             it("resolves provider using canonized name", function() {
                 var tm = function( testToResolve ) { return testToResolve; },
                     td = function() { return true; };
